@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberLens - Spot Phishing Scams & Dangerous Links in Seconds</title>
+
+    <!-- Custom SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23090d16'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2306b6d4' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%2306b6d4'/%3E%3C/svg%3E">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#070b14',
+                            card: '#0d1322',
+                            cardBorder: '#1e293b',
+                            accent: '#06b6d4',
+                            indigo: '#6366f1',
+                            danger: '#ef4444',
+                            safe: '#10b981',
+                            warning: '#f59e0b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.4)',
+                        'glow-indigo': '0 0 25px -5px rgba(99, 102, 241, 0.4)',
+                        'glow-danger': '0 0 25px -5px rgba(239, 68, 68, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #070b14;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070b14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+
+        .glass-panel {
+            background: rgba(13, 19, 34, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Animated Risk Score Gauges */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" onclick="showLandingView(); return false;" class="flex items-center space-x-3 group">
+                <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 p-0.5 shadow-glow-cyan transition-transform duration-300 group-hover:scale-105">
+                    <div class="w-full h-full bg-cyber-bg rounded-[10px] flex items-center justify-center">
+                        <svg class="w-6 h-6 text-cyan-400 group-hover:rotate-45 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 3a9 9 0 0 1 6.36 15.36M12 21a9 9 0 0 1-6.36-15.36" stroke="#6366f1" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="3" fill="#06b6d4"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                        Cyber<span class="gradient-text">Lens</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/50">AI v2.4</span>
+                    </span>
+                    <span class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Threat Intelligence</span>
+                </div>
+            </a>
+
+            <!-- Nav Links (Visible on Landing Page) -->
+            <nav id="landingNav" class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                <a href="#capabilities" onclick="navigateToSection('capabilities')" class="hover:text-cyan-400 transition-colors">Core Capabilities</a>
+                <a href="#how-it-works" onclick="navigateToSection('how-it-works')" class="hover:text-cyan-400 transition-colors">How It Works</a>
+                <a href="#threat-prevention" onclick="navigateToSection('threat-prevention')" class="hover:text-cyan-400 transition-colors">Threat Prevention</a>
+            </nav>
+
+            <!-- Action CTA Button -->
+            <div class="flex items-center space-x-3">
+                <button id="navBackendStatus" class="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400" title="Click to test API connection">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                    <span id="navStatusText">Checking Server...</span>
+                </button>
+                <button onclick="showScannerView()" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 shadow-glow-cyan transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-xs"></i>
+                    <span>Launch AI Scanner</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- LANDING PAGE VIEW -->
+    <main id="landingView" class="flex-grow">
+        
+        <!-- HERO SECTION -->
+        <section class="relative pt-16 pb-24 px-4 overflow-hidden">
+            <!-- Background Glow Ellipses -->
+            <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-cyan-500/15 to-indigo-500/15 blur-[120px] rounded-full pointer-events-none"></div>
+
+            <div class="max-w-5xl mx-auto text-center relative z-10">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-800/40 text-cyan-300 text-xs font-medium mb-6 backdrop-blur-md">
+                    <span class="flex h-2 w-2 rounded-full bg-cyan-400"></span>
+                    Dual-Engine Machine Learning Protection
+                </div>
+
+                <!-- Main Hero Headline -->
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white mb-6 leading-tight">
+                    Spot Phishing Scams & <span class="gradient-text">Dangerous Links</span> in Seconds.
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-10 font-normal leading-relaxed">
+                    Protect yourself from targeted email phishing, SMS scams, and malicious URLs. Powered by trained AI models that instantly analyze patterns, urgency triggers, and domain threat vectors.
+                </p>
+
+                <!-- Primary CTA buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                    <button onclick="showScannerView()" class="w-full sm:w-auto px-8 py-4 rounded-xl text-base font-bold text-white bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 shadow-glow-cyan transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-shield-halved text-lg"></i>
+                        <span>Launch AI Scanner</span>
+                    </button>
+                    <a href="#how-it-works" onclick="navigateToSection('how-it-works')" class="w-full sm:w-auto px-8 py-4 rounded-xl text-base font-semibold text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 transition-all flex items-center justify-center gap-2">
+                        <span>Explore Architecture</span>
+                        <i class="fa-solid fa-arrow-down text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Live Metrics Bar -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400 mb-1">650K+</div>
+                        <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Trained URL Dataset</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-indigo-400 mb-1">98.4%</div>
+                        <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Detection Accuracy</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mb-1">&lt; 150ms</div>
+                        <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">Instant AI Response</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-purple-400 mb-1">Dual-AI</div>
+                        <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">NLP + N-Gram Model</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CORE CAPABILITIES SECTION -->
+        <section id="capabilities" class="py-20 px-4 bg-slate-950/50 border-t border-slate-900">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2">Core Capabilities</h2>
+                    <p class="text-3xl sm:text-4xl font-extrabold text-white">Specialized AI Detection Scanners</p>
+                    <p class="text-slate-400 mt-3 text-base">CyberLens splits threat detection into two purpose-built Machine Learning models for maximum accuracy.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Phishing Scanner Card -->
+                    <div class="glass-card p-8 rounded-3xl relative overflow-hidden group flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-cyan-950/80 border border-cyan-800/50 flex items-center justify-center text-cyan-400 text-2xl mb-6 shadow-glow-cyan">
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-3">Phishing Scanner</h3>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                                Analyzes emails, SMS text messages, and urgent notifications for psychological social engineering tactics, credential harvest lures, and artificial urgency triggers.
+                            </p>
+                            <ul class="space-y-2.5 text-xs text-slate-400 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-cyan-400"></i> TF-IDF NLP Keyword Vectorization</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-cyan-400"></i> Detects Fake Account Suspension Lures</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-cyan-400"></i> Financial & Banking Scam Identification</li>
+                            </ul>
+                        </div>
+                        <button onclick="launchScannerWithSample('phishing')" class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-cyan-950/60 border border-slate-700 hover:border-cyan-500/50 text-cyan-300 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Test Phishing Scanner Sample</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Malware URL Scanner Card -->
+                    <div class="glass-card p-8 rounded-3xl relative overflow-hidden group flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all"></div>
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-indigo-950/80 border border-indigo-800/50 flex items-center justify-center text-indigo-400 text-2xl mb-6 shadow-glow-indigo">
+                                <i class="fa-solid fa-link"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-3">Malware URL Scanner</h3>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                                Inspects suspicious links, domain names, IP-hosted portals, and typosquatted URLs using character-level N-gram feature extraction.
+                            </p>
+                            <ul class="space-y-2.5 text-xs text-slate-400 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Character-level N-Gram Sequence Modeling</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Identifies Lookalike Domain Spoofing</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Flags Direct IP & Malicious Payloads</li>
+                            </ul>
+                        </div>
+                        <button onclick="launchScannerWithSample('url')" class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-indigo-950/60 border border-slate-700 hover:border-indigo-500/50 text-indigo-300 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                            <span>Test Malware URL Sample</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS SECTION -->
+        <section id="how-it-works" class="py-20 px-4 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-2">How It Works</h2>
+                    <p class="text-3xl sm:text-4xl font-extrabold text-white">4-Step AI Threat Analysis Pipeline</p>
+                    <p class="text-slate-400 mt-3 text-base">Click any step below to explore how CyberLens processes inputs into actionable risk scores.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-8 items-center">
+                    <!-- Interactive Steps List -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div onclick="selectPipelineStep(1)" id="step-btn-1" class="pipeline-step-btn p-5 rounded-2xl glass-card cursor-pointer border-l-4 border-cyan-400 bg-slate-900/90 transition-all">
+                            <div class="flex items-center gap-4">
+                                <span class="w-8 h-8 rounded-full bg-cyan-950 text-cyan-400 text-sm font-extrabold flex items-center justify-center border border-cyan-800">1</span>
+                                <div>
+                                    <h4 class="font-bold text-white text-base">Input Ingestion & Sanitation</h4>
+                                    <p class="text-xs text-slate-400">Raw text & URL normalization</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectPipelineStep(2)" id="step-btn-2" class="pipeline-step-btn p-5 rounded-2xl glass-card cursor-pointer border-l-4 border-transparent hover:border-slate-600 transition-all">
+                            <div class="flex items-center gap-4">
+                                <span class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 text-sm font-extrabold flex items-center justify-center">2</span>
+                                <div>
+                                    <h4 class="font-bold text-white text-base">Feature Extraction (TF-IDF & N-Gram)</h4>
+                                    <p class="text-xs text-slate-400">Converting text into numerical matrices</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectPipelineStep(3)" id="step-btn-3" class="pipeline-step-btn p-5 rounded-2xl glass-card cursor-pointer border-l-4 border-transparent hover:border-slate-600 transition-all">
+                            <div class="flex items-center gap-4">
+                                <span class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 text-sm font-extrabold flex items-center justify-center">3</span>
+                                <div>
+                                    <h4 class="font-bold text-white text-base">Dual-Model Probability Scoring</h4>
+                                    <p class="text-xs text-slate-400">Logistic regression threat calculation</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectPipelineStep(4)" id="step-btn-4" class="pipeline-step-btn p-5 rounded-2xl glass-card cursor-pointer border-l-4 border-transparent hover:border-slate-600 transition-all">
+                            <div class="flex items-center gap-4">
+                                <span class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 text-sm font-extrabold flex items-center justify-center">4</span>
+                                <div>
+                                    <h4 class="font-bold text-white text-base">Actionable Safety Guidance</h4>
+                                    <p class="text-xs text-slate-400">Mitigation steps & instant risk alert</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Inspection Card -->
+                    <div class="lg:col-span-7">
+                        <div class="glass-panel p-8 rounded-3xl border border-slate-800 relative min-h-[340px] flex flex-col justify-between">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-800/80">
+                                <span id="pipelineStepTag" class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Step 1 of 4</span>
+                                <span class="text-xs text-slate-500 font-mono">Module: pipeline.py</span>
+                            </div>
+                            <div class="py-6">
+                                <h3 id="pipelineStepTitle" class="text-2xl font-bold text-white mb-3">Input Ingestion & Sanitation</h3>
+                                <p id="pipelineStepDesc" class="text-slate-300 text-sm leading-relaxed mb-6">
+                                    When you paste an email or web link into CyberLens, the system strips tracking parameters, decodes encoded URLs, and routes the content to the appropriate specialized AI engine.
+                                </p>
+                                <div id="pipelineCodeBox" class="p-4 rounded-xl bg-slate-950 font-mono text-xs text-cyan-300 border border-slate-800 overflow-x-auto">
+                                    <code>def is_url(text): return bool(re.match(r'^(https?://|www\.)', text))</code>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-800/80">
+                                <span class="text-xs text-slate-400">Latency: <span class="text-emerald-400 font-mono">&lt; 5ms</span></span>
+                                <button onclick="showScannerView()" class="text-xs text-cyan-400 font-bold hover:underline flex items-center gap-1">
+                                    Try in Live Scanner <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THREAT PREVENTION & CHECKLIST SECTION -->
+        <section id="threat-prevention" class="py-20 px-4 bg-slate-950/50 border-t border-slate-900">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2">Threat Prevention</h2>
+                    <p class="text-3xl sm:text-4xl font-extrabold text-white">Interactive Security Risk Assessment</p>
+                    <p class="text-slate-400 mt-3 text-base">Check the suspicious signs present in the message or URL you received to estimate its risk level instantly.</p>
+                </div>
+
+                <div class="grid md:grid-cols-12 gap-8 items-start">
+                    <!-- Red Flag Checklist Calculator -->
+                    <div class="md:col-span-7 glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800">
+                        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-cyan-400"></i>
+                            Phishing & Link Red-Flag Checklist
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-6">Select all red flags that apply to your message/link:</p>
+
+                        <div class="space-y-3 mb-8">
+                            <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                <input type="checkbox" onchange="calculateChecklistRisk()" class="checklist-item mt-1 w-4 h-4 rounded text-cyan-500 bg-slate-950 border-slate-700 focus:ring-0">
+                                <div>
+                                    <span class="text-sm font-semibold text-white">Creates extreme urgency</span>
+                                    <p class="text-xs text-slate-400">Threatens account suspension within 24h or legal action.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                <input type="checkbox" onchange="calculateChecklistRisk()" class="checklist-item mt-1 w-4 h-4 rounded text-cyan-500 bg-slate-950 border-slate-700 focus:ring-0">
+                                <div>
+                                    <span class="text-sm font-semibold text-white">Lookalike Domain or IP Address</span>
+                                    <p class="text-xs text-slate-400">Uses spelling tricks like `paypa1.com` or direct numbers like `192.168.1.5`.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                <input type="checkbox" onchange="calculateChecklistRisk()" class="checklist-item mt-1 w-4 h-4 rounded text-cyan-500 bg-slate-950 border-slate-700 focus:ring-0">
+                                <div>
+                                    <span class="text-sm font-semibold text-white">Requests sensitive actions</span>
+                                    <p class="text-xs text-slate-400">Asks to verify passwords, PINs, OTPs, or credit card numbers.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                <input type="checkbox" onchange="calculateChecklistRisk()" class="checklist-item mt-1 w-4 h-4 rounded text-cyan-500 bg-slate-950 border-slate-700 focus:ring-0">
+                                <div>
+                                    <span class="text-sm font-semibold text-white">Generic greeting or odd sender address</span>
+                                    <p class="text-xs text-slate-400">Addressed to "Dear Customer" from an unrelated Gmail/Yahoo address.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Calculated Live Risk Gauge -->
+                        <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 block">Estimated Threat Level</span>
+                                <span id="checklistRiskLabel" class="text-lg font-bold text-emerald-400">Low Risk (0 Flags)</span>
+                            </div>
+                            <button onclick="showScannerView()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition">
+                                Scan Message Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Security Tips Cards -->
+                    <div class="md:col-span-5 space-y-4">
+                        <div class="glass-card p-6 rounded-2xl">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-950 text-cyan-400 flex items-center justify-center mb-4">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <h4 class="font-bold text-white text-base mb-1">Verify Domain Ownership</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Always hover over links before clicking. Ensure the root domain matches the official website (e.g., `apple.com` vs `apple-support-verify.com`).
+                            </p>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-950 text-indigo-400 flex items-center justify-center mb-4">
+                                <i class="fa-solid fa-key"></i>
+                            </div>
+                            <h4 class="font-bold text-white text-base mb-1">Enable Hardware 2FA</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Use FIDO2 Security Keys or Authenticator apps instead of SMS OTPs, which are vulnerable to SIM swapping and phishing proxy sites.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- AI SCANNER WORKSPACE VIEW (CHATBOT INTERFACE) -->
+    <div id="scannerView" class="hidden flex-grow flex flex-col h-[calc(100vh-65px)]">
+        <div class="flex-grow flex overflow-hidden">
+            
+            <!-- SIDEBAR: Scan History & Settings -->
+            <aside id="scannerSidebar" class="w-72 bg-slate-950 border-r border-slate-800 flex-col justify-between hidden md:flex">
+                <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <button onclick="startNewScan()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-cyan-400"></i>
+                        <span>New Scan Session</span>
+                    </button>
+                </div>
+
+                <!-- History List -->
+                <div class="flex-grow p-3 overflow-y-auto space-y-2" id="historyList">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3 py-1">Recent Scans</div>
+                    <!-- Dynamic history items rendered here -->
+                </div>
+
+                <!-- Clear History Footer -->
+                <div class="p-4 border-t border-slate-800">
+                    <button onclick="clearScanHistory()" class="w-full text-xs text-slate-400 hover:text-rose-400 transition flex items-center justify-center gap-2 py-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Clear History</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- MAIN CHAT AREA -->
+            <section class="flex-grow flex flex-col bg-cyber-bg relative">
+                
+                <!-- Chat Top Controls Header -->
+                <div class="px-6 py-3 border-b border-slate-800/80 bg-slate-950/40 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <button onclick="showLandingView()" class="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Back to Home</span>
+                        </button>
+                        <span class="text-slate-600">|</span>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-slate-400 font-medium hidden sm:inline">Target Model:</label>
+                            <select id="scannerMode" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500">
+                                <option value="auto">⚡ Auto-Detect Input Type</option>
+                                <option value="phishing">✉️ Phishing Email / SMS</option>
+                                <option value="url">🔗 Malware & Phishing URL</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live AI Backend Indicator -->
+                    <div class="flex items-center gap-2">
+                        <span id="backendStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span id="backendStatusLabel">Python AI Active</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Chat Messages Scroll Container -->
+                <div id="chatContainer" class="flex-grow p-4 sm:p-6 overflow-y-auto space-y-6">
+                    
+                    <!-- Welcome AI Message -->
+                    <div class="flex gap-4 max-w-3xl">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-glow-cyan">
+                            <i class="fa-solid fa-robot text-sm"></i>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="glass-panel p-4 rounded-2xl rounded-tl-none border border-slate-800 text-sm text-slate-200 leading-relaxed">
+                                👋 Welcome to <strong>CyberLens AI Scanner</strong>. Paste any suspicious email message, SMS text, or web URL below. I will inspect it using trained machine learning models and provide an instant risk score.
+                            </div>
+
+                            <!-- Quick Sample Chips -->
+                            <div class="flex flex-wrap gap-2 pt-1">
+                                <span class="text-xs text-slate-400 self-center mr-1">Try sample:</span>
+                                <button onclick="fillSample('phishing_urgent')" class="px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs text-cyan-300 transition">
+                                    Urgent Bank Suspended (Phishing)
+                                </button>
+                                <button onclick="fillSample('url_malware')" class="px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs text-indigo-300 transition">
+                                    Suspicious Login URL (Malware)
+                                </button>
+                                <button onclick="fillSample('safe_google')" class="px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs text-emerald-300 transition">
+                                    Official Google Link (Safe)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Input Chat Box -->
+                <div class="p-4 border-t border-slate-800/80 bg-slate-950/60">
+                    <form id="scanForm" onsubmit="handleScanSubmit(event)" class="max-w-4xl mx-auto relative">
+                        <textarea 
+                            id="scanInput" 
+                            rows="2" 
+                            placeholder="Paste suspicious text or web URL here..." 
+                            class="w-full bg-slate-900/90 text-slate-100 placeholder-slate-500 text-sm rounded-2xl p-4 pr-28 border border-slate-800 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none transition"
+                            onkeydown="handleKeyPress(event)"
+                        ></textarea>
+                        
+                        <div class="absolute right-3 bottom-4 flex items-center gap-2">
+                            <button 
+                                type="submit" 
+                                id="sendBtn"
+                                class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-bold shadow-glow-cyan transition flex items-center gap-2"
+                            >
+                                <span>Scan</span>
+                                <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="text-[11px] text-center text-slate-500 mt-2">
+                        Press Shift + Enter for new lines • Enter to submit
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+
+    <!-- FOOTER SECTION -->
+    <footer id="landingFooter" class="border-t border-slate-900 bg-slate-950 py-8 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-slate-300">CyberLens AI Security</span>
+                <span>• Dual Machine Learning Protection</span>
+            </div>
+            <div>
+                Built for public threat detection. Endpoint: <code class="text-cyan-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">/api/scan</code>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Global State & History
+        let scanHistory = JSON.parse(localStorage.getItem('cyberlens_history') || '[]');
+        let isBackendAvailable = false;
+
+        // Initialize Application
+        window.onload = function() {
+            checkBackendConnection();
+            renderHistoryList();
+            
+            // Periodically re-check connection state
+            setInterval(checkBackendConnection, 15000);
+        };
+
+        // --- SECTION NAVIGATION ---
+        function showLandingView() {
+            document.getElementById('landingView').classList.remove('hidden');
+            document.getElementById('landingFooter').classList.remove('hidden');
+            document.getElementById('scannerView').classList.add('hidden');
+            document.getElementById('landingNav').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showScannerView() {
+            document.getElementById('landingView').classList.add('hidden');
+            document.getElementById('landingFooter').classList.add('hidden');
+            document.getElementById('scannerView').classList.remove('hidden');
+        }
+
+        function navigateToSection(sectionId) {
+            showLandingView();
+            setTimeout(() => {
+                const el = document.getElementById(sectionId);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 50);
+        }
+
+        function launchScannerWithSample(type) {
+            showScannerView();
+            if (type === 'phishing') {
+                fillSample('phishing_urgent');
+            } else {
+                fillSample('url_malware');
+            }
+        }
+
+        // --- BACKEND API HEALTH CHECK ---
+        async function checkBackendConnection() {
+            const navStatusText = document.getElementById('navStatusText');
+            const navBackendStatus = document.getElementById('navBackendStatus');
+            const backendStatusBadge = document.getElementById('backendStatusBadge');
+            const backendStatusLabel = document.getElementById('backendStatusLabel');
+
+            try {
+                // Test POST to relative endpoint /api/scan with empty test input
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ input: 'http://test-health-check.com', mode: 'auto' })
+                });
+
+                if (response.ok) {
+                    isBackendAvailable = true;
+                    if (navStatusText) navStatusText.textContent = "Python AI Server Connected";
+                    if (navBackendStatus) {
+                        navBackendStatus.classList.remove('bg-slate-900', 'text-slate-400');
+                        navBackendStatus.classList.add('bg-emerald-950/80', 'text-emerald-400', 'border-emerald-800');
+                    }
+                    if (backendStatusBadge) {
+                        backendStatusBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/50";
+                    }
+                    if (backendStatusLabel) backendStatusLabel.textContent = "Python AI Server Active";
+                } else {
+                    throw new Error("Server responded with non-200");
+                }
+            } catch (err) {
+                isBackendAvailable = false;
+                if (navStatusText) navStatusText.textContent = "Local Fallback Engine Active";
+                if (backendStatusBadge) {
+                    backendStatusBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-950/80 text-amber-400 border border-amber-800/50";
+                }
+                if (backendStatusLabel) backendStatusLabel.textContent = "Local Fallback Engine";
+            }
+        }
+
+        // --- QUICK SAMPLES & KEY PRESSES ---
+        function fillSample(sampleKey) {
+            const inputEl = document.getElementById('scanInput');
+            if (sampleKey === 'phishing_urgent') {
+                inputEl.value = "URGENT: Your account access has been suspended due to unauthorized login attempts. Click here immediately to verify your identity: http://secure-bank-update-verify.com/login";
+            } else if (sampleKey === 'url_malware') {
+                inputEl.value = "http://download-free-software-crack.ru/setup.exe";
+            } else if (sampleKey === 'safe_google') {
+                inputEl.value = "https://www.google.com/search?q=cybersecurity+best+practices";
+            }
+            inputEl.focus();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleScanSubmit(e);
+            }
+        }
+
+        // --- SUBMIT SCAN HANDLER ---
+        async function handleScanSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('scanInput');
+            const userText = inputEl.value.trim();
+            const mode = document.getElementById('scannerMode').value;
+
+            if (!userText) return;
+
+            // 1. Append User Message
+            appendUserMessage(userText);
+            inputEl.value = '';
+
+            // 2. Append AI Thinking Message
+            const thinkingId = appendThinkingMessage();
+
+            // 3. Perform Threat Scan (API with Fallback)
+            try {
+                let result;
+                if (isBackendAvailable) {
+                    try {
+                        const response = await fetch('/api/scan', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ input: userText, mode: mode })
+                        });
+                        if (!response.ok) throw new Error("API scan failed");
+                        result = await response.json();
+                        result.engine_source = "Python Machine Learning Server";
+                    } catch (apiErr) {
+                        result = runLocalHeuristicClassifier(userText, mode);
+                        result.engine_source = "Local Fallback Engine";
+                    }
+                } else {
+                    result = runLocalHeuristicClassifier(userText, mode);
+                    result.engine_source = "Local Fallback Engine";
+                }
+
+                // Remove Thinking indicator & Render Result
+                removeMessage(thinkingId);
+                appendAIResponse(result);
+                saveScanToHistory(result);
+
+            } catch (err) {
+                removeMessage(thinkingId);
+                appendErrorMessage("An error occurred while inspecting your input. Please try again.");
+            }
+        }
+
+        // --- LOCAL HEURISTIC CLASSIFIER (FALLBACK ENGINE) ---
+        function runLocalHeuristicClassifier(input, mode) {
+            const textLower = input.toLowerCase();
+            const isUrlInput = Boolean(textLower.match(/^(https?:\/\/|www\.)/) || (textLower.includes('.') && !textLower.includes(' ')));
+
+            let riskScore = 15;
+            let threatTriggers = [];
+
+            if (isUrlInput || mode === 'url') {
+                if (textLower.includes('.ru') || textLower.includes('.tk') || textLower.includes('.xyz') || textLower.includes('.exe')) {
+                    riskScore += 65;
+                    threatTriggers.push("Suspicious TLD / Payload Extension");
+                }
+                if (textLower.includes('paypal') || textLower.includes('bank') || textLower.includes('verify') || textLower.includes('login')) {
+                    riskScore += 25;
+                    threatTriggers.push("Brand Spoofing Keyword");
+                }
+                if (textLower.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
+                    riskScore += 50;
+                    threatTriggers.push("Direct IP Address Host");
+                }
+            } else {
+                if (textLower.includes('urgent') || textLower.includes('suspended') || textLower.includes('action required')) {
+                    riskScore += 40;
+                    threatTriggers.push("Urgency Social Engineering Lure");
+                }
+                if (textLower.includes('password') || textLower.includes('verify') || textLower.includes('click here')) {
+                    riskScore += 35;
+                    threatTriggers.push("Credential Harvest Lure");
+                }
+            }
+
+            riskScore = Math.min(Math.max(riskScore, 5), 98);
+            const isThreat = riskScore >= 50;
+
+            return {
+                input: input,
+                model_used: isUrlInput ? "URL Scanner Model" : "Email/Text Phishing Model",
+                prediction: isThreat ? (isUrlInput ? 'phishing/malware' : 'phishing') : 'benign',
+                risk_score: riskScore,
+                status: isThreat ? 'Threat Detected' : 'Safe',
+                threat_triggers: threatTriggers
+            };
+        }
+
+        // --- CHAT DOM BUILDERS ---
+        function appendUserMessage(text) {
+            const chatContainer = document.getElementById('chatContainer');
+            const msgHtml = `
+                <div class="flex gap-4 max-w-3xl justify-end ml-auto">
+                    <div class="glass-panel p-4 rounded-2xl rounded-tr-none border border-cyan-500/30 bg-cyan-950/30 text-sm text-slate-100 leading-relaxed">
+                        ${escapeHtml(text)}
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0">
+                        <i class="fa-solid fa-user text-xs"></i>
+                    </div>
+                </div>
+            `;
+            chatContainer.insertAdjacentHTML('beforeend', msgHtml);
+            scrollToBottom();
+        }
+
+        function appendThinkingMessage() {
+            const id = 'thinking-' + Date.now();
+            const chatContainer = document.getElementById('chatContainer');
+            const msgHtml = `
+                <div id="${id}" class="flex gap-4 max-w-3xl">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-glow-cyan">
+                        <i class="fa-solid fa-robot text-sm"></i>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl rounded-tl-none border border-slate-800 text-sm text-slate-400 flex items-center gap-3">
+                        <i class="fa-solid fa-circle-notch animate-spin text-cyan-400"></i>
+                        <span>Scanning input across ML models...</span>
+                    </div>
+                </div>
+            `;
+            chatContainer.insertAdjacentHTML('beforeend', msgHtml);
+            scrollToBottom();
+            return id;
+        }
+
+        function removeMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function appendAIResponse(res) {
+            const chatContainer = document.getElementById('chatContainer');
+            const isThreat = res.status === 'Threat Detected' || res.risk_score >= 50;
+            const badgeBg = isThreat ? 'bg-rose-950/80 text-rose-400 border-rose-800/80' : 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80';
+            const riskMeterColor = isThreat ? '#ef4444' : '#10b981';
+
+            const cardHtml = `
+                <div class="flex gap-4 max-w-3xl">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-glow-cyan">
+                        <i class="fa-solid fa-shield-halved text-sm"></i>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl rounded-tl-none border border-slate-800 w-full space-y-5">
+                        
+                        <!-- Header Status Bar -->
+                        <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${badgeBg}">
+                                    ${isThreat ? '⚠️ THREAT DETECTED' : '✅ SAFE / BENIGN'}
+                                </span>
+                                <span class="text-xs text-slate-400 font-mono">Model: ${res.model_used}</span>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-mono">${res.engine_source || 'CyberLens Engine'}</span>
+                        </div>
+
+                        <!-- Risk Score Gauge + Breakdown -->
+                        <div class="grid sm:grid-cols-12 gap-4 items-center">
+                            <div class="sm:col-span-4 flex flex-col items-center justify-center p-4 bg-slate-950 rounded-xl border border-slate-800">
+                                <div class="relative w-20 h-20 flex items-center justify-center mb-1">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path stroke-dasharray="${res.risk_score}, 100" stroke="${riskMeterColor}" stroke-width="3.5" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    </svg>
+                                    <span class="absolute text-xl font-extrabold text-white">${res.risk_score}%</span>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Risk Score</span>
+                            </div>
+
+                            <div class="sm:col-span-8 space-y-2 text-xs">
+                                <div class="text-slate-300 font-semibold">Analyzed Input Snippet:</div>
+                                <div class="p-2.5 rounded-lg bg-slate-950 font-mono text-slate-400 truncate border border-slate-900">
+                                    ${escapeHtml(res.input)}
+                                </div>
+                                ${isThreat ? `
+                                    <div class="text-rose-400 font-semibold pt-1">Mitigation Advice:</div>
+                                    <p class="text-slate-400 leading-normal">
+                                        Do not click any links, download attachments, or enter credentials. Report this message to your security administrator.
+                                    </p>
+                                ` : `
+                                    <div class="text-emerald-400 font-semibold pt-1">Safety Notice:</div>
+                                    <p class="text-slate-400 leading-normal">
+                                        No phishing or malware triggers detected. Always verify domain names prior to entering sensitive credentials.
+                                    </p>
+                                `}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+            chatContainer.insertAdjacentHTML('beforeend', cardHtml);
+            scrollToBottom();
+        }
+
+        function appendErrorMessage(msg) {
+            const chatContainer = document.getElementById('chatContainer');
+            const html = `
+                <div class="flex gap-4 max-w-3xl">
+                    <div class="w-9 h-9 rounded-xl bg-rose-900/80 text-rose-300 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl rounded-tl-none border border-rose-800/60 text-xs text-rose-300">
+                        ${msg}
+                    </div>
+                </div>
+            `;
+            chatContainer.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        // --- HISTORY MANAGEMENT ---
+        function saveScanToHistory(res) {
+            const item = {
+                id: Date.now(),
+                input: res.input,
+                status: res.status,
+                risk_score: res.risk_score,
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            scanHistory.unshift(item);
+            if (scanHistory.length > 20) scanHistory.pop();
+            localStorage.setItem('cyberlens_history', JSON.stringify(scanHistory));
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            const listEl = document.getElementById('historyList');
+            if (!listEl) return;
+
+            if (scanHistory.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3 py-1">Recent Scans</div>
+                    <div class="text-xs text-slate-600 px-3 py-2 italic">No previous scans</div>
+                `;
+                return;
+            }
+
+            let html = `<div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3 py-1">Recent Scans</div>`;
+            scanHistory.forEach(item => {
+                const isThreat = item.status === 'Threat Detected';
+                const badgeColor = isThreat ? 'text-rose-400' : 'text-emerald-400';
+                html += `
+                    <div class="p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800/60 cursor-pointer transition text-xs" onclick="fillSampleFromHistory('${escapeHtml(item.input)}')">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-bold ${badgeColor} truncate max-w-[120px]">${isThreat ? 'Threat' : 'Safe'} (${item.risk_score}%)</span>
+                            <span class="text-[10px] text-slate-500">${item.date}</span>
+                        </div>
+                        <div class="text-slate-400 truncate text-[11px]">${escapeHtml(item.input)}</div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        function fillSampleFromHistory(text) {
+            document.getElementById('scanInput').value = text;
+            document.getElementById('scanInput').focus();
+        }
+
+        function clearScanHistory() {
+            scanHistory = [];
+            localStorage.removeItem('cyberlens_history');
+            renderHistoryList();
+        }
+
+        function startNewScan() {
+            document.getElementById('scanInput').value = '';
+            document.getElementById('scanInput').focus();
+        }
+
+        // --- PIPELINE STEP SELECTOR ---
+        function selectPipelineStep(stepNum) {
+            const steps = [
+                {
+                    tag: "Step 1 of 4",
+                    title: "Input Ingestion & Sanitation",
+                    desc: "When you paste an email or web link into CyberLens, the system strips tracking parameters, decodes encoded URLs, and routes the content to the appropriate specialized AI engine.",
+                    code: "def is_url(text): return bool(re.match(r'^(https?://|www\\.)', text))"
+                },
+                {
+                    tag: "Step 2 of 4",
+                    title: "Feature Extraction (TF-IDF & N-Gram)",
+                    desc: "Texts are tokenized using TF-IDF word frequency vectorization. URLs are analyzed using character-level (3-4) N-gram slicing to catch lookalike domain typos and obfuscation.",
+                    code: "TfidfVectorizer(analyzer='char', ngram_range=(3, 4), max_features=20000)"
+                },
+                {
+                    tag: "Step 3 of 4",
+                    title: "Dual-Model Probability Scoring",
+                    desc: "The vector matrix is evaluated against pre-trained Logistic Regression classifiers. Probabilities are extracted to calculate a calibrated risk percentage (0 to 100%).",
+                    code: "risk_score = int((1.0 - safe_probability) * 100)"
+                },
+                {
+                    tag: "Step 4 of 4",
+                    title: "Actionable Safety Guidance",
+                    desc: "CyberLens renders immediate verdict badges, visual threat gauges, identified risk signals, and customized step-by-step mitigation instructions.",
+                    code: "return jsonify({'status': 'Threat Detected', 'risk_score': risk_score})"
+                }
+            ];
+
+            const current = steps[stepNum - 1];
+            document.getElementById('pipelineStepTag').textContent = current.tag;
+            document.getElementById('pipelineStepTitle').textContent = current.title;
+            document.getElementById('pipelineStepDesc').textContent = current.desc;
+            document.getElementById('pipelineCodeBox').innerHTML = `<code>${escapeHtml(current.code)}</code>`;
+
+            // Update UI styling for step buttons
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                if (i === stepNum) {
+                    btn.className = "pipeline-step-btn p-5 rounded-2xl glass-card cursor-pointer border-l-4 border-cyan-400 bg-slate-900/90 transition-all";
+                } else {
+                    btn.className = "pipeline-step-btn p-5 rounded-2xl glass-card cursor-pointer border-l-4 border-transparent hover:border-slate-600 transition-all";
+                }
+            }
+        }
+
+        // --- CHECKLIST RISK CALCULATOR ---
+        function calculateChecklistRisk() {
+            const checkedCount = document.querySelectorAll('.checklist-item:checked').length;
+            const labelEl = document.getElementById('checklistRiskLabel');
+
+            if (checkedCount === 0) {
+                labelEl.textContent = "Low Risk (0 Flags)";
+                labelEl.className = "text-lg font-bold text-emerald-400";
+            } else if (checkedCount === 1) {
+                labelEl.textContent = "Moderate Risk (1 Flag)";
+                labelEl.className = "text-lg font-bold text-amber-400";
+            } else if (checkedCount === 2) {
+                labelEl.textContent = "High Threat Risk (2 Flags)";
+                labelEl.className = "text-lg font-bold text-orange-400";
+            } else {
+                labelEl.textContent = `CRITICAL THREAT (${checkedCount} Flags)`;
+                labelEl.className = "text-lg font-bold text-rose-400";
+            }
+        }
+
+        // --- UTILS ---
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+    </script>
+</body>
+</html>
